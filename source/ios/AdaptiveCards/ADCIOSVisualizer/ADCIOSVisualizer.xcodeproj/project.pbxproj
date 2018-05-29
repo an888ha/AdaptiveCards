@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1681458720B8094F008340A2 /* CutomsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1681458620B8094F008340A2 /* CutomsTableViewController.m */; };
+		1681458B20B809B3008340A2 /* CustomTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1681458920B809B3008340A2 /* CustomTableViewCell.m */; };
+		1681458C20B809B3008340A2 /* CustomTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1681458A20B809B3008340A2 /* CustomTableViewCell.xib */; };
+		16FB857620BBDBFD005CCA29 /* AdaptiveCardsActionHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FB857520BBDBFD005CCA29 /* AdaptiveCardsActionHandler.m */; };
 		6BF339D620A665E600DA5973 /* CustomTextBlockRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6BF339D420A665E600DA5973 /* CustomTextBlockRenderer.mm */; };
 		6BF339E320A66A3F00DA5973 /* AdaptiveCards.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6BF339E220A66A3F00DA5973 /* AdaptiveCards.framework */; };
 		6BF339E420A66A4D00DA5973 /* AdaptiveCards.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6BF339E220A66A3F00DA5973 /* AdaptiveCards.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -111,6 +115,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1681458520B8094F008340A2 /* CutomsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CutomsTableViewController.h; sourceTree = "<group>"; };
+		1681458620B8094F008340A2 /* CutomsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CutomsTableViewController.m; sourceTree = "<group>"; };
+		1681458820B809B3008340A2 /* CustomTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomTableViewCell.h; sourceTree = "<group>"; };
+		1681458920B809B3008340A2 /* CustomTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomTableViewCell.m; sourceTree = "<group>"; };
+		1681458A20B809B3008340A2 /* CustomTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomTableViewCell.xib; sourceTree = "<group>"; };
+		16FB857420BBDBFD005CCA29 /* AdaptiveCardsActionHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdaptiveCardsActionHandler.h; sourceTree = "<group>"; };
+		16FB857520BBDBFD005CCA29 /* AdaptiveCardsActionHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdaptiveCardsActionHandler.m; sourceTree = "<group>"; };
 		6BF339D420A665E600DA5973 /* CustomTextBlockRenderer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CustomTextBlockRenderer.mm; sourceTree = "<group>"; };
 		6BF339D520A665E600DA5973 /* CustomTextBlockRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomTextBlockRenderer.h; sourceTree = "<group>"; };
 		6BF339E220A66A3F00DA5973 /* AdaptiveCards.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AdaptiveCards.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -256,6 +267,13 @@
 		F423C0741EE1FB6100905679 /* ADCIOSVisualizer */ = {
 			isa = PBXGroup;
 			children = (
+				16FB857420BBDBFD005CCA29 /* AdaptiveCardsActionHandler.h */,
+				16FB857520BBDBFD005CCA29 /* AdaptiveCardsActionHandler.m */,
+				1681458520B8094F008340A2 /* CutomsTableViewController.h */,
+				1681458620B8094F008340A2 /* CutomsTableViewController.m */,
+				1681458820B809B3008340A2 /* CustomTableViewCell.h */,
+				1681458920B809B3008340A2 /* CustomTableViewCell.m */,
+				1681458A20B809B3008340A2 /* CustomTableViewCell.xib */,
 				6BF339D520A665E600DA5973 /* CustomTextBlockRenderer.h */,
 				6BF339D420A665E600DA5973 /* CustomTextBlockRenderer.mm */,
 				F4F44BA8204CF98900A2F24C /* CustomProgressBarRenderer.h */,
@@ -435,7 +453,7 @@
 				TargetAttributes = {
 					F423C0711EE1FB6100905679 = {
 						CreatedOnToolsVersion = 8.3.2;
-						DevelopmentTeam = UBF8T346G9;
+						DevelopmentTeam = F8UR6AV3W2;
 						ProvisioningStyle = Automatic;
 					};
 					F423C08D1EE1FB6100905679 = {
@@ -485,6 +503,7 @@
 				F4933CCD1F79852C00F6EBFD /* ColumnSet.Spacing.json in Resources */,
 				F4933CC21F79852C00F6EBFD /* Action.OpenUrl.json in Resources */,
 				F4933CFE1F79853B00F6EBFD /* FlightItinerary.json in Resources */,
+				1681458C20B809B3008340A2 /* CustomTableViewCell.xib in Resources */,
 				F4933CC81F79852C00F6EBFD /* Column.Style.json in Resources */,
 				F4F44B8320478E1100A2F24C /* DateTimeTestTranslation.json in Resources */,
 				F4933CE81F79852C00F6EBFD /* TextBlock.Markdown.json in Resources */,
@@ -556,10 +575,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1681458720B8094F008340A2 /* CutomsTableViewController.m in Sources */,
 				F4F44BAA204CF98900A2F24C /* CustomProgressBarRenderer.mm in Sources */,
+				16FB857620BBDBFD005CCA29 /* AdaptiveCardsActionHandler.m in Sources */,
 				F4D33E861F04705800941E44 /* ACVTableViewController.m in Sources */,
 				6BF339D620A665E600DA5973 /* CustomTextBlockRenderer.mm in Sources */,
 				F423C07D1EE1FB6100905679 /* ViewController.m in Sources */,
+				1681458B20B809B3008340A2 /* CustomTableViewCell.m in Sources */,
 				F423C07A1EE1FB6100905679 /* AppDelegate.m in Sources */,
 				F4F255721F993CD200A80D39 /* CustomActionOpenURLRenderer.mm in Sources */,
 				F423C0831EE1FB6100905679 /* ADCIOSVisualizer.xcdatamodeld in Sources */,
@@ -729,7 +751,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = UBF8T346G9;
+				DEVELOPMENT_TEAM = F8UR6AV3W2;
 				INFOPLIST_FILE = ADCIOSVisualizer/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = MSFT.ADCIOSVisualizer;
@@ -741,7 +763,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = UBF8T346G9;
+				DEVELOPMENT_TEAM = F8UR6AV3W2;
 				INFOPLIST_FILE = ADCIOSVisualizer/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = MSFT.ADCIOSVisualizer;
