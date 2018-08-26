@@ -17,10 +17,6 @@ NSString *uncheckedRadioButtonReuseID = @"unchecked-radiobutton";
 
 const CGFloat padding = 16.0f;
 const CGFloat accessoryViewWidth = 50.0f;
-typedef NS_ENUM(NSInteger, ACRCellSelected) {
-    ACRCellSelectedYES = 0,
-    ACRCellSelectedNO = 1
-};
 
 @implementation ACRChoiceSetCell
 
@@ -30,13 +26,13 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
     if(self) {
         UIImage *iconImage = nil;
         if([reuseIdentifier isEqualToString:@"checked-checkbox"]){
-            iconImage = [UIImage imageNamed:@"checked-checkbox-24.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
+            iconImage = [self getCheckBoxButtonSelectedState];
         } else if([reuseIdentifier isEqualToString:@"checked-radiobutton"]){
-            iconImage = [UIImage imageNamed:@"checked.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
+            iconImage = [self getRadioButtonForSelectedState];
         } else if([reuseIdentifier isEqualToString:@"unchecked-checkbox"]){
-            iconImage = [UIImage imageNamed:@"unchecked-checkbox-24.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
+            iconImage = [self getCheckBoxButtonUnselectedState];
         } else {
-            iconImage = [UIImage imageNamed:@"unchecked.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
+            iconImage = [self getRadioButtonForUnselectedState];
         }
         self.imageView.image = iconImage;
         self.textLabel.numberOfLines = 0;
@@ -44,6 +40,51 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
         self.textLabel.adjustsFontSizeToFitWidth = NO;
     }
     return self;
+}
+
+- (UIImage*) getRadioButtonForSelectedState{
+    UIImage *image = nil;
+    if (self.acrChoiceSetResourceDelegate){
+        image =  [self.acrChoiceSetResourceDelegate getRadioButtonForSelectedState];
+    }
+    else{
+        image = [UIImage imageNamed:@"checked.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
+    }
+    return image;
+}
+
+- (UIImage*) getRadioButtonForUnselectedState{
+    UIImage *image = nil;
+    if (self.acrChoiceSetResourceDelegate){
+        image =  [self.acrChoiceSetResourceDelegate getRadioButtonForUnselectedState];
+    }
+    else{
+        image = [UIImage imageNamed:@"unchecked.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
+    }
+    return image;
+}
+
+- (UIImage*) getCheckBoxButtonSelectedState{
+    UIImage *image = nil;
+    if (self.acrChoiceSetResourceDelegate){
+        image =  [self.acrChoiceSetResourceDelegate getCheckBoxButtonSelectedState];
+    }
+    else{
+        image = [UIImage imageNamed:@"checked-checkbox-24.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
+    }
+    return image;
+}
+
+- (UIImage*) getCheckBoxButtonUnselectedState{
+    UIImage *image = nil;
+    if (self.acrChoiceSetResourceDelegate){
+        image =  [self.acrChoiceSetResourceDelegate getCheckBoxButtonUnselectedState];
+    }
+    else{
+        image = [UIImage imageNamed:@"unchecked-checkbox-24.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
+        
+    }
+    return image;
 }
 
 @end
@@ -64,7 +105,7 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
     if(self)
     {
         self.id = [[NSString alloc]initWithCString:choiceSet->GetId().c_str()
-                                           encoding:NSUTF8StringEncoding];
+                                          encoding:NSUTF8StringEncoding];
         _isMultiChoicesAllowed = choiceSet->GetIsMultiSelect();
         _choiceSetDataSource = choiceSet;
         _userSelections = [[NSMutableDictionary alloc] init];
@@ -73,16 +114,16 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
                                                      encoding:NSUTF8StringEncoding];
         _defaultValuesArray = [defaultValues componentsSeparatedByCharactersInSet:
                                [NSCharacterSet characterSetWithCharactersInString:@","]];
-
+        
         if (_isMultiChoicesAllowed || [_defaultValuesArray count] == 1){
             _defaultValuesSet = [NSMutableSet setWithArray:_defaultValuesArray];
         }
-
+        
         NSUInteger index = 0;
         for(const auto& choice : _choiceSetDataSource->GetChoices()) {
             NSString *keyForDefaultValue = [NSString stringWithCString:choice->GetValue().c_str()
                                                               encoding:NSUTF8StringEncoding];
-
+            
             if([_defaultValuesSet containsObject:keyForDefaultValue]){
                 _userSelections[[NSNumber numberWithInteger:index]] = [NSNumber numberWithBool:YES];
             }
@@ -107,7 +148,7 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = nil;
-
+    
     if(_userSelections[[NSNumber numberWithInteger:indexPath.row]] == [NSNumber numberWithBool:YES]){
         if(_isMultiChoicesAllowed) {
             cell = [tableView dequeueReusableCellWithIdentifier:checkedCheckboxReuseID];
@@ -121,37 +162,16 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
             cell = [tableView dequeueReusableCellWithIdentifier:uncheckedRadioButtonReuseID];
         }
     }
-
-    NSString *title = [NSString stringWithCString:_choiceSetDataSource->GetChoices()[indexPath.row]->GetTitle().c_str()
-                               encoding:NSUTF8StringEncoding];
-    cell.textLabel.text = title;
-    cell.textLabel.numberOfLines = 0;
-    cell.textLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    cell.textLabel.adjustsFontSizeToFitWidth = NO;
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    UIImage *radioImage = nil;
-
-    if(_userSelections[[NSNumber numberWithInteger:indexPath.row]] == [NSNumber numberWithBool:YES]){
-        if(cell.tag == ACRCellSelectedNO) {
-            if(_isMultiChoicesAllowed) {
-                radioImage = [self getCheckBoxButtonSelectedState];
-            } else {
-                radioImage = [self getRadioButtonForSelectedState];
-            }
-        }
-        cell.tag = ACRCellSelectedYES;
-    } else {
-        if(cell.tag == ACRCellSelectedYES) {
-            if(_isMultiChoicesAllowed) {
-                radioImage = [self getCheckBoxButtonUnselectedState];
-            } else {
-                radioImage = [self getRadioButtonForUnselectedState];
-            }
-            cell.tag = ACRCellSelectedNO;
-        }
+    
+    if([cell isKindOfClass:[ACRChoiceSetCell class]]) {
+        ((ACRChoiceSetCell *)cell).acrChoiceSetResourceDelegate = self.acrChoiceSetResourceDelegate;
     }
-
-    cell.imageView.image = radioImage;
+    
+    NSString *title = [NSString stringWithCString:_choiceSetDataSource->GetChoices()[indexPath.row]->GetTitle().c_str()
+                                         encoding:NSUTF8StringEncoding];
+    cell.textLabel.text = title;
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    
     return cell;
 }
 
@@ -160,16 +180,7 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
     // update the current selection
     if([_userSelections count] &&
        [_userSelections objectForKey:[NSNumber numberWithInteger:indexPath.row]] &&
-       [[_userSelections objectForKey:[NSNumber numberWithInteger:indexPath.row]] boolValue] == YES)
-    {
-        [cell setSelected:YES animated:NO];
-        UIImage *radioImage = nil;
-        if(_isMultiChoicesAllowed) {
-            radioImage = [self getCheckBoxButtonSelectedState];
-        } else {
-            radioImage = [self getRadioButtonForSelectedState];
-        }
-        cell.imageView.image = radioImage;
+       [[_userSelections objectForKey:[NSNumber numberWithInteger:indexPath.row]] boolValue] == YES) {
         _currentSelectedIndexPath = indexPath;
     }
 }
@@ -188,31 +199,18 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
 {
     NSMutableArray *indexPathsToUpdate = [NSMutableArray arrayWithObject:indexPath];
     if (!_isMultiChoicesAllowed) {
-        UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-        UIImage *radioImage = [self getRadioButtonForSelectedState];
-        cell.imageView.image = radioImage;
-        cell.tag = ACRCellSelectedYES;
-
-        _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:YES];
         if (_currentSelectedIndexPath && _currentSelectedIndexPath != indexPath) {
             // deselect currently selected index path
             [indexPathsToUpdate addObject:_currentSelectedIndexPath];
             [self tableView:tableView didDeselectRowAtIndexPath:_currentSelectedIndexPath];
         }
         _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:YES];
+        
     } else {
-        if ([tableView cellForRowAtIndexPath:indexPath].tag == ACRCellSelectedYES) {
-            UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+        if ([_userSelections[[NSNumber numberWithInteger:indexPath.row]] boolValue]) {
             _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:NO];
-            UIImage *radioImage = [self getCheckBoxButtonUnselectedState];
-            cell.imageView.image = radioImage;
-            cell.tag = ACRCellSelectedNO;
         } else {
-            UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
             _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:YES];
-            UIImage *radioImage = [self getCheckBoxButtonSelectedState];
-            cell.imageView.image = radioImage;
-            cell.tag = ACRCellSelectedYES;
         }
     }
     
@@ -225,10 +223,6 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
     // uncheck selection if multi choice is not allowed
     if (!_isMultiChoicesAllowed) {
         _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:NO];
-        UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-        UIImage *radioImage = [self getRadioButtonForUnselectedState];
-        cell.imageView.image = radioImage;
-        cell.tag = ACRCellSelectedNO;
         _currentSelectedIndexPath = nil;
     }
 }
@@ -237,10 +231,10 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
 {
     UITableViewCell *cell = [tableView.dataSource tableView:tableView cellForRowAtIndexPath:indexPath];
     CGSize labelStringSize =
-        [cell.textLabel.text boundingRectWithSize:CGSizeMake(cell.contentView.frame.size.width - accessoryViewWidth, CGFLOAT_MAX)
-                                          options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading
-                                       attributes:@{NSFontAttributeName:cell.textLabel.font}
-                                          context:nil].size;
+    [cell.textLabel.text boundingRectWithSize:CGSizeMake(cell.contentView.frame.size.width - accessoryViewWidth, CGFLOAT_MAX)
+                                      options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading
+                                   attributes:@{NSFontAttributeName:cell.textLabel.font}
+                                      context:nil].size;
     return labelStringSize.height + padding;
 }
 
@@ -290,51 +284,6 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
         return nil;
     }
     return [values componentsJoinedByString:@", "];
-}
-
-- (UIImage*) getRadioButtonForSelectedState{
-    UIImage *image = nil;
-    if (self.acrChoiceSetResourceDelegate){
-        image =  [self.acrChoiceSetResourceDelegate getRadioButtonForSelectedState];
-    }
-    else{
-        image = [UIImage imageNamed:@"checked.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
-    }
-    return image;
-}
-
-- (UIImage*) getRadioButtonForUnselectedState{
-    UIImage *image = nil;
-    if (self.acrChoiceSetResourceDelegate){
-        image =  [self.acrChoiceSetResourceDelegate getRadioButtonForUnselectedState];
-    }
-    else{
-        image = [UIImage imageNamed:@"unchecked.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
-    }
-    return image;
-}
-
-- (UIImage*) getCheckBoxButtonSelectedState{
-    UIImage *image = nil;
-    if (self.acrChoiceSetResourceDelegate){
-        image =  [self.acrChoiceSetResourceDelegate getCheckBoxButtonSelectedState];
-    }
-    else{
-        image = [UIImage imageNamed:@"checked-checkbox-24.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
-    }
-    return image;
-}
-
-- (UIImage*) getCheckBoxButtonUnselectedState{
-    UIImage *image = nil;
-    if (self.acrChoiceSetResourceDelegate){
-        image =  [self.acrChoiceSetResourceDelegate getCheckBoxButtonUnselectedState];
-    }
-    else{
-        image = [UIImage imageNamed:@"unchecked-checkbox-24.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
-        
-    }
-    return image;
 }
 
 @end

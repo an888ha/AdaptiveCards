@@ -18,6 +18,7 @@ extern NSString *checkedRadioButtonReuseID;
 extern NSString *uncheckedRadioButtonReuseID;
 
 @interface ACRChoiceSetCell : UITableViewCell
+@property (weak) id<ACRChoiceSetResourceDelegate> acrChoiceSetResourceDelegate;
 @end
 
 @interface ACRChoiceSetViewDataSource:NSObject<UITableViewDataSource, UITableViewDelegate, ACRIBaseInputHandler>
