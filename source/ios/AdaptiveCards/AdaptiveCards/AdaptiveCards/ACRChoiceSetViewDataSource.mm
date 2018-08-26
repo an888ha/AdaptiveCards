@@ -24,22 +24,26 @@ const CGFloat accessoryViewWidth = 50.0f;
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if(self) {
-        UIImage *iconImage = nil;
-        if([reuseIdentifier isEqualToString:@"checked-checkbox"]){
-            iconImage = [self getCheckBoxButtonSelectedState];
-        } else if([reuseIdentifier isEqualToString:@"checked-radiobutton"]){
-            iconImage = [self getRadioButtonForSelectedState];
-        } else if([reuseIdentifier isEqualToString:@"unchecked-checkbox"]){
-            iconImage = [self getCheckBoxButtonUnselectedState];
-        } else {
-            iconImage = [self getRadioButtonForUnselectedState];
-        }
-        self.imageView.image = iconImage;
+        [self setUpCellWithReuseIdentifier:reuseIdentifier];
         self.textLabel.numberOfLines = 0;
         self.textLabel.lineBreakMode = NSLineBreakByWordWrapping;
         self.textLabel.adjustsFontSizeToFitWidth = NO;
     }
     return self;
+}
+
+- (void)setUpCellWithReuseIdentifier:(NSString *)reuseIdentifier{
+    UIImage *iconImage = nil;
+    if([reuseIdentifier isEqualToString:@"checked-checkbox"]){
+        iconImage = [self getCheckBoxButtonSelectedState];
+    } else if([reuseIdentifier isEqualToString:@"checked-radiobutton"]){
+        iconImage = [self getRadioButtonForSelectedState];
+    } else if([reuseIdentifier isEqualToString:@"unchecked-checkbox"]){
+        iconImage = [self getCheckBoxButtonUnselectedState];
+    } else {
+        iconImage = [self getRadioButtonForUnselectedState];
+    }
+    self.imageView.image = iconImage;
 }
 
 - (UIImage*) getRadioButtonForSelectedState{
@@ -148,23 +152,17 @@ const CGFloat accessoryViewWidth = 50.0f;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = nil;
-    
+    NSString *cellIdentifier = @"";
     if(_userSelections[[NSNumber numberWithInteger:indexPath.row]] == [NSNumber numberWithBool:YES]){
-        if(_isMultiChoicesAllowed) {
-            cell = [tableView dequeueReusableCellWithIdentifier:checkedCheckboxReuseID];
-        } else {
-            cell = [tableView dequeueReusableCellWithIdentifier:checkedRadioButtonReuseID];
-        }
+        cellIdentifier = _isMultiChoicesAllowed ? checkedCheckboxReuseID : checkedRadioButtonReuseID;
     } else {
-        if(_isMultiChoicesAllowed) {
-            cell = [tableView dequeueReusableCellWithIdentifier:uncheckedCheckboxReuseID];
-        } else {
-            cell = [tableView dequeueReusableCellWithIdentifier:uncheckedRadioButtonReuseID];
-        }
+        cellIdentifier = _isMultiChoicesAllowed ? uncheckedCheckboxReuseID : uncheckedRadioButtonReuseID;
     }
-    
+    cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if([cell isKindOfClass:[ACRChoiceSetCell class]]) {
-        ((ACRChoiceSetCell *)cell).acrChoiceSetResourceDelegate = self.acrChoiceSetResourceDelegate;
+        ACRChoiceSetCell *choiceCell = (ACRChoiceSetCell *)cell;
+        choiceCell.acrChoiceSetResourceDelegate = self.acrChoiceSetResourceDelegate;
+        [choiceCell setUpCellWithReuseIdentifier:cellIdentifier];
     }
     
     NSString *title = [NSString stringWithCString:_choiceSetDataSource->GetChoices()[indexPath.row]->GetTitle().c_str()
