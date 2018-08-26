@@ -125,9 +125,7 @@ static NSString *pickerCell = @"pickerCell";
         pickerView.dataSource = self;
         pickerView.delegate = self;
         pickerView.hidden = NO;
-        [pickerView selectRow:_userSelectedRow
-                  inComponent:0
-                     animated:NO];
+        [pickerView selectRow:_userSelectedRow inComponent:0 animated:NO];
     }
     cell.backgroundColor = UIColor.groupTableViewBackgroundColor;
     return cell;
@@ -167,8 +165,6 @@ static NSString *pickerCell = @"pickerCell";
         UIPickerView *pickerView = [cell viewWithTag:pickerViewId];
         if(_showPickerView == YES){
             _showPickerView = NO;
-            //[tableView beginUpdates];
-            //[tableView endUpdates];
             pickerView.alpha = 0.0f;
             [UIView animateWithDuration:0.25
                              animations:^{

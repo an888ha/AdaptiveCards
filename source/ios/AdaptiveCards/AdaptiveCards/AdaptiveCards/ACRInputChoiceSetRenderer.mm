@@ -36,8 +36,19 @@
     std::shared_ptr<BaseCardElement> elem = [acoElem element];
     std::shared_ptr<ChoiceSetInput> choiceSet = std::dynamic_pointer_cast<ChoiceSetInput>(elem);
     // creates a tableview with pre-defined style
-    ACRInputTableView *choiceSetView = [[ACRInputTableView alloc] initWithSuperview:viewGroup];
+    NSBundle *bundle = [NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"];
+    if(!bundle){
+        // TODO Add Render Error - jwoo
+        return nil;
+    }
+    ACRInputTableView *choiceSetView = [bundle loadNibNamed:@"ACRInputTableView" owner:self options:nil][0];
+    choiceSetView.frame = CGRectMake(0, 0, viewGroup.frame.size.width, viewGroup.frame.size.height);
     NSObject<UITableViewDelegate, UITableViewDataSource> *dataSource = nil;
+
+    [choiceSetView registerClass:[ACRChoiceSetCell class] forCellReuseIdentifier:checkedCheckboxReuseID];
+    [choiceSetView registerClass:[ACRChoiceSetCell class] forCellReuseIdentifier:uncheckedCheckboxReuseID];
+    [choiceSetView registerClass:[ACRChoiceSetCell class] forCellReuseIdentifier:checkedRadioButtonReuseID];
+    [choiceSetView registerClass:[ACRChoiceSetCell class] forCellReuseIdentifier:uncheckedRadioButtonReuseID];
 
     if(choiceSet->GetChoiceSetStyle() == ChoiceSetStyle::Compact && choiceSet->GetIsMultiSelect() == false) {
         dataSource = [[ACRChoiceSetViewDataSourceCompactStyle alloc] initWithInputChoiceSet:choiceSet rootView:rootView];
@@ -46,11 +57,11 @@
         dataSource = [[ACRChoiceSetViewDataSource alloc] initWithInputChoiceSet:choiceSet];
         [choiceSetView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     }
-    
+
     choiceSetView.delegate = dataSource;
     choiceSetView.dataSource = dataSource;
-    [inputs addObject:dataSource];    
-    
+    [inputs addObject:dataSource];
+
     if(elem->GetHeight() == HeightType::Stretch){
         ACRColumnView *textInputContainer = [[ACRColumnView alloc] init];
         [textInputContainer addArrangedSubview:choiceSetView];
@@ -72,7 +83,7 @@
                                  attribute:NSLayoutAttributeLeading
                                 multiplier:1.0
                                   constant:0].active = YES;
-    
+
     [NSLayoutConstraint constraintWithItem:choiceSetView
                                  attribute:NSLayoutAttributeTrailing
                                  relatedBy:NSLayoutRelationLessThanOrEqual

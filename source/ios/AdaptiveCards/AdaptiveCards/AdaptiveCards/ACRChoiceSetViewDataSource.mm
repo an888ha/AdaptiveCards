@@ -10,6 +10,11 @@
 
 using namespace AdaptiveCards;
 
+NSString *checkedCheckboxReuseID = @"checked-checkbox";
+NSString *uncheckedCheckboxReuseID = @"unchecked-checkbox";
+NSString *checkedRadioButtonReuseID = @"checked-radiobutton";
+NSString *uncheckedRadioButtonReuseID = @"unchecked-radiobutton";
+
 const CGFloat padding = 16.0f;
 const CGFloat accessoryViewWidth = 50.0f;
 typedef NS_ENUM(NSInteger, ACRCellSelected) {
@@ -17,11 +22,38 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
     ACRCellSelectedNO = 1
 };
 
+@implementation ACRChoiceSetCell
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(nullable NSString *)reuseIdentifier
+{
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if(self) {
+        UIImage *iconImage = nil;
+        if([reuseIdentifier isEqualToString:@"checked-checkbox"]){
+            iconImage = [UIImage imageNamed:@"checked-checkbox-24.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
+        } else if([reuseIdentifier isEqualToString:@"checked-radiobutton"]){
+            iconImage = [UIImage imageNamed:@"checked.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
+        } else if([reuseIdentifier isEqualToString:@"unchecked-checkbox"]){
+            iconImage = [UIImage imageNamed:@"unchecked-checkbox-24.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
+        } else {
+            iconImage = [UIImage imageNamed:@"unchecked.png" inBundle:[NSBundle bundleWithIdentifier:@"MSFT.AdaptiveCards"] compatibleWithTraitCollection:nil];
+        }
+        self.imageView.image = iconImage;
+        self.textLabel.numberOfLines = 0;
+        self.textLabel.lineBreakMode = NSLineBreakByWordWrapping;
+        self.textLabel.adjustsFontSizeToFitWidth = NO;
+    }
+    return self;
+}
+
+@end
+
 @implementation ACRChoiceSetViewDataSource
 {
     std::shared_ptr<ChoiceSetInput> _choiceSetDataSource;
     NSMutableDictionary *_userSelections;
-    NSIndexPath *_lastSelectedIndexPath;
+    // used for radio button; keep tracking of the current choice
+    NSIndexPath *_currentSelectedIndexPath;
     NSMutableSet *_defaultValuesSet;
     NSArray *_defaultValuesArray;
 }
@@ -36,7 +68,7 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
         _isMultiChoicesAllowed = choiceSet->GetIsMultiSelect();
         _choiceSetDataSource = choiceSet;
         _userSelections = [[NSMutableDictionary alloc] init];
-        _lastSelectedIndexPath = nil;
+        _currentSelectedIndexPath = nil;
         NSString *defaultValues = [NSString stringWithCString:_choiceSetDataSource->GetValue().c_str()
                                                      encoding:NSUTF8StringEncoding];
         _defaultValuesArray = [defaultValues componentsSeparatedByCharactersInSet:
@@ -74,23 +106,35 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *identifier = @"tabCellId";
-    [tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:identifier];
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
-    if(!cell)
-    {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
-                                      reuseIdentifier:identifier];
+    UITableViewCell *cell = nil;
+
+    if(_userSelections[[NSNumber numberWithInteger:indexPath.row]] == [NSNumber numberWithBool:YES]){
+        if(_isMultiChoicesAllowed) {
+            cell = [tableView dequeueReusableCellWithIdentifier:checkedCheckboxReuseID];
+        } else {
+            cell = [tableView dequeueReusableCellWithIdentifier:checkedRadioButtonReuseID];
+        }
+    } else {
+        if(_isMultiChoicesAllowed) {
+            cell = [tableView dequeueReusableCellWithIdentifier:uncheckedCheckboxReuseID];
+        } else {
+            cell = [tableView dequeueReusableCellWithIdentifier:uncheckedRadioButtonReuseID];
+        }
     }
+
     NSString *title = [NSString stringWithCString:_choiceSetDataSource->GetChoices()[indexPath.row]->GetTitle().c_str()
                                encoding:NSUTF8StringEncoding];
     cell.textLabel.text = title;
+<<<<<<< HEAD
     cell.textLabel.numberOfLines = 0;
     cell.textLabel.lineBreakMode = NSLineBreakByWordWrapping;
     cell.textLabel.adjustsFontSizeToFitWidth = NO;
+=======
+>>>>>>> 8fbb4517b2320c686b17298a71a8d92d9822de53
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     UIImage *radioImage = nil;
 
+<<<<<<< HEAD
     if(_userSelections[[NSNumber numberWithInteger:indexPath.row]] == [NSNumber numberWithBool:YES]){
         if(cell.tag == ACRCellSelectedNO) {
             if(_isMultiChoicesAllowed) {
@@ -113,15 +157,17 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
 
     cell.imageView.image = radioImage;
 
+=======
+>>>>>>> 8fbb4517b2320c686b17298a71a8d92d9822de53
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // if this tableView was used before for gathering input,
-    // load the tableView with user selection
+    // update the current selection
     if([_userSelections count] &&
        [_userSelections objectForKey:[NSNumber numberWithInteger:indexPath.row]] &&
+<<<<<<< HEAD
        [[_userSelections objectForKey:[NSNumber numberWithInteger:indexPath.row]] boolValue] == YES)
     {
         [cell setSelected:YES animated:NO];
@@ -133,6 +179,10 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
         }
         cell.imageView.image = radioImage;
         _lastSelectedIndexPath = indexPath;
+=======
+       [[_userSelections objectForKey:[NSNumber numberWithInteger:indexPath.row]] boolValue] == YES) {
+        _currentSelectedIndexPath = indexPath;
+>>>>>>> 8fbb4517b2320c686b17298a71a8d92d9822de53
     }
 }
 
@@ -148,7 +198,9 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    NSMutableArray *indexPathsToUpdate = [NSMutableArray arrayWithObject:indexPath];
     if (!_isMultiChoicesAllowed) {
+<<<<<<< HEAD
         UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
         UIImage *radioImage = [self getRadioButtonForSelectedState];
         cell.imageView.image = radioImage;
@@ -172,8 +224,25 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
             UIImage *radioImage = [self getCheckBoxButtonSelectedState];
             cell.imageView.image = radioImage;
             cell.tag = ACRCellSelectedYES;
+=======
+        if (_currentSelectedIndexPath && _currentSelectedIndexPath != indexPath) {
+            // deselect currently selected index path
+            [indexPathsToUpdate addObject:_currentSelectedIndexPath];
+            [self tableView:tableView didDeselectRowAtIndexPath:_currentSelectedIndexPath];
+        }
+        _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:YES];
+
+    } else {
+        if ([_userSelections[[NSNumber numberWithInteger:indexPath.row]] boolValue]) {
+            _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:NO];
+        } else {
+            _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:YES];
+>>>>>>> 8fbb4517b2320c686b17298a71a8d92d9822de53
         }
     }
+    
+    [tableView reloadRowsAtIndexPaths:indexPathsToUpdate withRowAnimation:UITableViewRowAnimationNone];
+    _currentSelectedIndexPath = indexPath;
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(nonnull NSIndexPath *)indexPath
@@ -181,10 +250,14 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
     // uncheck selection if multi choice is not allowed
     if (!_isMultiChoicesAllowed) {
         _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:NO];
+<<<<<<< HEAD
         UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
         UIImage *radioImage = [self getRadioButtonForUnselectedState];
         cell.imageView.image = radioImage;
         cell.tag = ACRCellSelectedNO;
+=======
+        _currentSelectedIndexPath = nil;
+>>>>>>> 8fbb4517b2320c686b17298a71a8d92d9822de53
     }
 }
 
