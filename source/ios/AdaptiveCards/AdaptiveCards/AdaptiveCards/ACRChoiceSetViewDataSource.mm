@@ -125,16 +125,12 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
     NSString *title = [NSString stringWithCString:_choiceSetDataSource->GetChoices()[indexPath.row]->GetTitle().c_str()
                                encoding:NSUTF8StringEncoding];
     cell.textLabel.text = title;
-<<<<<<< HEAD
     cell.textLabel.numberOfLines = 0;
     cell.textLabel.lineBreakMode = NSLineBreakByWordWrapping;
     cell.textLabel.adjustsFontSizeToFitWidth = NO;
-=======
->>>>>>> 8fbb4517b2320c686b17298a71a8d92d9822de53
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     UIImage *radioImage = nil;
 
-<<<<<<< HEAD
     if(_userSelections[[NSNumber numberWithInteger:indexPath.row]] == [NSNumber numberWithBool:YES]){
         if(cell.tag == ACRCellSelectedNO) {
             if(_isMultiChoicesAllowed) {
@@ -156,9 +152,6 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
     }
 
     cell.imageView.image = radioImage;
-
-=======
->>>>>>> 8fbb4517b2320c686b17298a71a8d92d9822de53
     return cell;
 }
 
@@ -167,7 +160,6 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
     // update the current selection
     if([_userSelections count] &&
        [_userSelections objectForKey:[NSNumber numberWithInteger:indexPath.row]] &&
-<<<<<<< HEAD
        [[_userSelections objectForKey:[NSNumber numberWithInteger:indexPath.row]] boolValue] == YES)
     {
         [cell setSelected:YES animated:NO];
@@ -178,11 +170,7 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
             radioImage = [self getRadioButtonForSelectedState];
         }
         cell.imageView.image = radioImage;
-        _lastSelectedIndexPath = indexPath;
-=======
-       [[_userSelections objectForKey:[NSNumber numberWithInteger:indexPath.row]] boolValue] == YES) {
         _currentSelectedIndexPath = indexPath;
->>>>>>> 8fbb4517b2320c686b17298a71a8d92d9822de53
     }
 }
 
@@ -200,17 +188,18 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
 {
     NSMutableArray *indexPathsToUpdate = [NSMutableArray arrayWithObject:indexPath];
     if (!_isMultiChoicesAllowed) {
-<<<<<<< HEAD
         UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
         UIImage *radioImage = [self getRadioButtonForSelectedState];
         cell.imageView.image = radioImage;
         cell.tag = ACRCellSelectedYES;
 
         _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:YES];
-        if (_lastSelectedIndexPath && _lastSelectedIndexPath != indexPath) {
-            [self tableView:tableView didDeselectRowAtIndexPath:_lastSelectedIndexPath];
-            _lastSelectedIndexPath = nil;
+        if (_currentSelectedIndexPath && _currentSelectedIndexPath != indexPath) {
+            // deselect currently selected index path
+            [indexPathsToUpdate addObject:_currentSelectedIndexPath];
+            [self tableView:tableView didDeselectRowAtIndexPath:_currentSelectedIndexPath];
         }
+        _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:YES];
     } else {
         if ([tableView cellForRowAtIndexPath:indexPath].tag == ACRCellSelectedYES) {
             UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
@@ -224,20 +213,6 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
             UIImage *radioImage = [self getCheckBoxButtonSelectedState];
             cell.imageView.image = radioImage;
             cell.tag = ACRCellSelectedYES;
-=======
-        if (_currentSelectedIndexPath && _currentSelectedIndexPath != indexPath) {
-            // deselect currently selected index path
-            [indexPathsToUpdate addObject:_currentSelectedIndexPath];
-            [self tableView:tableView didDeselectRowAtIndexPath:_currentSelectedIndexPath];
-        }
-        _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:YES];
-
-    } else {
-        if ([_userSelections[[NSNumber numberWithInteger:indexPath.row]] boolValue]) {
-            _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:NO];
-        } else {
-            _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:YES];
->>>>>>> 8fbb4517b2320c686b17298a71a8d92d9822de53
         }
     }
     
@@ -250,14 +225,11 @@ typedef NS_ENUM(NSInteger, ACRCellSelected) {
     // uncheck selection if multi choice is not allowed
     if (!_isMultiChoicesAllowed) {
         _userSelections[[NSNumber numberWithInteger:indexPath.row]] = [NSNumber numberWithBool:NO];
-<<<<<<< HEAD
         UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
         UIImage *radioImage = [self getRadioButtonForUnselectedState];
         cell.imageView.image = radioImage;
         cell.tag = ACRCellSelectedNO;
-=======
         _currentSelectedIndexPath = nil;
->>>>>>> 8fbb4517b2320c686b17298a71a8d92d9822de53
     }
 }
 
