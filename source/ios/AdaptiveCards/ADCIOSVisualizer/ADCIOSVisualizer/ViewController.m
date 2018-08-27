@@ -14,6 +14,7 @@
 #import "CustomImageRenderer.h"
 #import "ADCResolver.h"
 #import "CustomChoiceSetRenderer.h"
+#import "CustomInputToggleRenderer.h"
 
 @interface ViewController ()
 {
@@ -76,6 +77,7 @@
         [registration setBaseCardElementRenderer:[CustomInputNumberRenderer getInstance] cardElementType:ACRNumberInput];
         [registration setBaseCardElementRenderer:[CustomImageRenderer getInstance] cardElementType:ACRImage];
         [registration setBaseCardElementRenderer:[CustomChoiceSetRenderer getInstance] cardElementType:ACRChoiceSetInput];
+        [registration setBaseCardElementRenderer:[CustomInputToggleRenderer getInstance] cardElementType:ACRToggleInput];
         _enableCustomRendererButton.backgroundColor = UIColor.redColor;
         _defaultRenderer = [registration getActionSetRenderer];
         [registration setActionSetRenderer:self];
@@ -86,6 +88,7 @@
         [registration setBaseCardElementRenderer:nil cardElementType:ACRNumberInput];
         [registration setBaseCardElementRenderer:nil cardElementType:ACRImage];
         [registration setBaseCardElementRenderer:nil cardElementType:ACRChoiceSetInput];
+        [registration setBaseCardElementRenderer:nil cardElementType:ACRToggleInput];
         [registration setActionSetRenderer:nil];
         _enableCustomRendererButton.backgroundColor = [UIColor colorWithRed:0/255 green:122.0/255 blue:1 alpha:1];
     }
