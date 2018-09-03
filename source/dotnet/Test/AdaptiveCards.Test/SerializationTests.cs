@@ -317,6 +317,45 @@ namespace AdaptiveCards.Test
         }
 
         [TestMethod]
+        public void ColumnTypeNotRequired()
+        {
+            var json = @"{
+  ""type"": ""AdaptiveCard"",
+  ""version"": ""1.0"",
+  ""body"": [
+    {
+      ""type"": ""ColumnSet"",
+      ""columns"": [
+        {
+          ""items"": [
+            {
+              ""type"": ""Image"",
+              ""url"": ""http://3.bp.blogspot.com/-Xo0EuTNYNQg/UEI1zqGDUTI/AAAAAAAAAYE/PLYx5H4J4-k/s1600/smiley+face+super+happy.jpg"",
+              ""size"": ""stretch""
+            }
+          ]
+        },
+        {
+          ""width"": ""stretch"",
+          ""items"": [
+            {
+              ""type"": ""TextBlock"",
+              ""text"": ""This card has two ColumnSets on top of each other. In each, the left column is explicitly sized to be 50 pixels wide."",
+              ""wrap"": true
+            }
+          ]
+        }
+       ]
+    }
+  ]
+}";
+
+            var result = AdaptiveCard.FromJson(json);
+
+            Assert.IsNotNull(result.Card);
+        }
+
+        [TestMethod]
         public void CardLevelSelectAction()
         {
             var json = @"{
@@ -415,6 +454,44 @@ namespace AdaptiveCards.Test
             // There should be 3 invalid colors in this card
             var parseResult = AdaptiveCard.FromJson(json);
             Assert.AreEqual(3, parseResult.Warnings.Count);
+        }
+
+        [TestMethod]
+        public void ExplicitImageSerializationTest()
+        {
+            var expected =
+@"{
+  ""type"": ""AdaptiveCard"",
+  ""version"": ""1.0"",
+  ""id"": ""myCard"",
+  ""body"": [
+    {
+      ""type"": ""Image"",
+      ""url"": ""http://adaptivecards.io/content/cats/1.png"",
+      ""width"": ""20px"",
+      ""height"": ""50px""
+    }
+  ]
+}";
+
+            var card = new AdaptiveCard
+            {
+                Id = "myCard",
+                Body =
+                {
+                    new AdaptiveImage("http://adaptivecards.io/content/cats/1.png")
+                    {
+                        PixelWidth = 20,
+                        PixelHeight = 50
+                    },
+                }
+            };
+
+            var actual = card.ToJson();
+            Assert.AreEqual(expected: expected, actual: actual);
+            var deserializedCard = AdaptiveCard.FromJson(expected).Card;
+            var deserializedActual = deserializedCard.ToJson();
+            Assert.AreEqual(expected: expected, actual: deserializedActual);
         }
     }
 }
